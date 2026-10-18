@@ -122,7 +122,7 @@ button.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)} bu
   <section class="card" id="start">
     <h2>هل أتقنتِ التعادل؟ أثبتي فهمك!</h2>
     <div class="steps">
-      <div class="step"><b style="background:#2E6FD8">1</b>أربعة أسئلة بنمط التحصيلي: نواتج التعادل، المعادلة الأيونية، قراءة رسم بياني، والملح الناتج.</div>
+      <div class="step"><b style="background:#2E6FD8">1</b>أربعة أسئلة بنمط التحصيلي: منحنى المعايرة، المعادلة الأيونية، تعريف المعايرة، والملح الناتج.</div>
       <div class="step"><b style="background:#D9A23A">2</b>يظهر السؤال على أجهزة المجموعات، وتضغط كل مجموعة إجابتها من جهازها.</div>
       <div class="step"><b style="background:#159C94">3</b>النقاط تلقائيًا حسب سرعة الإجابة الصحيحة: 20 ثم 15 ثم 10 ثم 5… وفي النهاية تظهر الفائزة ونسبة إتقان الفصل.</div>
     </div>
@@ -245,10 +245,30 @@ function curve(type){ // pH curve SVG, 50 mL 0.1 M acid + 0.1 M NaOH
     <text x="225" y="314" font-size="14" text-anchor="middle" fill="#1F4E6B">NaOH (mL)</text>
     <text x="16" y="150" font-size="15" fill="#1F4E6B" transform="rotate(-90 16 150)" text-anchor="middle">pH</text></svg>`;
 }
+function curveB(){ // معايرة قاعدة ضعيفة (NH3 50 mL 0.1 M) بحمض قوي HCl 0.1 M
+  const Kw=1e-14,Ka=Kw/1.8e-5;
+  const pH=v=>{const Vt=(50+v)/1000,Cb=0.005/Vt,Cl=0.0001*v/Vt;let lo=-14,hi=0;
+    for(let i=0;i<80;i++){const m=(lo+hi)/2,h=10**m;(h+Cb*h/(h+Ka)-Kw/h-Cl)>0?hi=m:lo=m;}return -(lo+hi)/2;};
+  const X=v=>50+v/80*350,Y=p=>40+(1-p/14)*230;let d='';
+  for(let v=0;v<=80;v+=(v>44&&v<56)?.1:.5){d+=(v?'L':'M')+X(v).toFixed(1)+' '+Y(pH(v)).toFixed(1);}
+  let g='';for(let p=0;p<=14;p+=2)g+=`<line x1="50" x2="400" y1="${Y(p)}" y2="${Y(p)}" stroke="#EFEAE0"/><text x="42" y="${Y(p)+5}" font-size="13" text-anchor="end" fill="#6b7d88">${p}</text>`;
+  for(let v=0;v<=80;v+=10)g+=`<line y1="40" y2="270" x1="${X(v)}" x2="${X(v)}" stroke="#EFEAE0"/>`;
+  const pe=pH(50);
+  return `<svg viewBox="0 0 410 320" width="100%" style="direction:ltr;font-family:Calibri,Arial">
+    <rect x="50" y="6" width="350" height="28" rx="6" fill="#1F4E6B"/><text x="225" y="26" font-size="17" font-weight="700" text-anchor="middle" fill="#fff" style="direction:rtl">معايرة قاعدة</text>${g}
+    <line x1="50" y1="270" x2="400" y2="270" stroke="#1F4E6B"/><line x1="50" y1="40" x2="50" y2="270" stroke="#1F4E6B"/>
+    <line x1="50" y1="${Y(pe)}" x2="${X(50)}" y2="${Y(pe)}" stroke="#B71C1C" stroke-width="2" stroke-dasharray="6 4"/>
+    <path d="${d}" fill="none" stroke="#159C94" stroke-width="3.5"/>
+    <circle cx="${X(50)}" cy="${Y(pe)}" r="6" fill="#B71C1C"/>
+    <circle cx="${X(50)}" cy="${Y(pe)}" r="13" fill="none" stroke="#D9A23A" stroke-width="3"/>
+    <text x="${X(50)+18}" y="${Y(pe)+6}" font-size="20" font-weight="700" fill="#C55A11">؟</text>
+    <text x="225" y="300" font-size="15" text-anchor="middle" fill="#1F4E6B" style="direction:rtl">الحمض المضاف</text>
+    <text x="16" y="155" font-size="15" fill="#1F4E6B" transform="rotate(-90 16 155)" text-anchor="middle">pH</text></svg>`;
+}
 const QS=[
- {type:'تحصيلي كيمياء',q:'نواتج تفاعل حمض الكبريتيك '+ion('H<sub>2</sub>SO<sub>4</sub>')+' مع هيدروكسيد البوتاسيوم '+ion('KOH')+' هي:',o:['ملح '+ion('K<sub>2</sub>SO<sub>4</sub>')+' وماء '+ion('H<sub>2</sub>O'),'ملح '+ion('K<sub>2</sub>SO<sub>4</sub>')+' وغاز الهيدروجين '+ion('H<sub>2</sub>'),ion('K<sub>2</sub>O')+' و '+ion('H<sub>2</sub>SO<sub>4</sub>'),ion('KH')+' و '+ion('SO<sub>4</sub>')+' فقط'],a:0,e:'حمض + قاعدة ← ملح + ماء: الملح كبريتات البوتاسيوم K₂SO₄ والماء H₂O.'},
- {type:'تحصيلي كيمياء',q:'المعادلة الأيونية النهائية لتعادل HNO<sub>3</sub> مع NaOH هي:',o:[ion('Na<sup>+</sup> + NO<sub>3</sub><sup>−</sup> → NaNO<sub>3</sub>'),ion('HNO<sub>3</sub> → H<sup>+</sup> + NO<sub>3</sub><sup>−</sup>'),ion('H<sup>+</sup> + OH<sup>−</sup> → H<sub>2</sub>O'),ion('NaOH → Na<sup>+</sup> + OH<sup>−</sup>')],a:2,e:'Na⁺ و NO₃⁻ أيونات متفرجة تُحذف، فيبقى H⁺ + OH⁻ → H₂O.'},
- {type:'تحصيلي كيمياء',fig:()=>curve('s'),q:'يمثل المنحنى تغيّر pH عند إضافة NaOH إلى HCl. ما قيمة pH عند النقطة المحددة (نقطة التعادل)؟',o:['1','7','10','14'],a:1,e:'عند نقطة التعادل لحمض قوي مع قاعدة قوية يتساوى عدد مولات H⁺ و OH⁻ فتكون pH = 7.'},
+ {type:'تحصيلي كيمياء',fig:()=>curveB(),q:'يمثل المنحنى معايرة قاعدة بحمض. ما قيمة '+ion('pH')+' عند نقطة التكافؤ لهذه المعايرة؟',o:['10','9','5','1'],a:2,e:'نقطة التكافؤ هي منتصف الجزء الرأسي الحاد من المنحنى، وتقابل pH ≈ 5.'},
+ {type:'تحصيلي كيمياء',q:'المعادلة الأيونية النهائية لتعادل '+ion('HI')+' مع '+ion('NaOH')+' هي:',o:[ion('Na<sup>+</sup> + I<sup>−</sup> → NaI'),ion('HI → H<sup>+</sup> + I<sup>−</sup>'),ion('H<sup>+</sup> + OH<sup>−</sup> → H<sub>2</sub>O'),ion('NaOH → Na<sup>+</sup> + OH<sup>−</sup>')],a:2,e:'Na⁺ و I⁻ أيونات متفرجة تُحذف، فيبقى H⁺ + OH⁻ → H₂O.'},
+ {type:'تحصيلي كيمياء',q:'المعايرة هي:',o:['طريقة لتحديد تركيز محلول بتفاعل حجم معلوم منه مع محلول معلوم التركيز','تفاعل حمض مع فلز لإنتاج ملح وغاز الهيدروجين','المادة التي يتغير لونها بتغير قيمة pH','طريقة لفصل مكونات المحلول بالتبخير'],a:0,e:'المعايرة: طريقة لتحديد تركيز محلول (حمض أو قاعدة) بتفاعل حجم معلوم منه مع محلول معلوم التركيز.'},
  {type:'تحصيلي كيمياء',q:'الملح الناتج من تعادل حمض الهيدروكلوريك '+ion('HCl')+' مع هيدروكسيد الصوديوم '+ion('NaOH')+' هو:',o:['هيدروكسيد الصوديوم '+ion('NaOH'),'كلوريد الصوديوم '+ion('NaCl'),'الماء '+ion('H<sub>2</sub>O'),'غاز الهيدروجين '+ion('H<sub>2</sub>')],a:1,e:'الملح يتكون من الأيون الموجب للقاعدة Na⁺ والأيون السالب للحمض Cl⁻ ← NaCl.'}
 ];
 const $=id=>document.getElementById(id);
