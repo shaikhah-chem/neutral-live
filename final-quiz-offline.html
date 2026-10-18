@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>التقويم الختامي التفاعلي – التعادل</title>
+<style>
+:root{--bg:#F8F5EE;--card:#fff;--line:#E3DCCB;--ink:#1F4E6B;--teal:#159C94;--teal-d:#0E7C76;--peach:#F2AE85;
+  --red:#B71C1C;--gold:#D9A23A;--blue:#2E6FD8;--orange:#C55A11;--green:#548235;--mint:#E3F4EC;--cream:#FFF8EC}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Sakkal Majalla","Traditional Arabic","Segoe UI",Tahoma,"Amiri",sans-serif}
+body{font-size:22px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 26px 0}
+.pill{background:var(--peach);color:#fff;border-radius:18px;padding:6px 26px;font-weight:700;font-size:34px;
+  outline:2px dashed #fff;outline-offset:-7px;display:flex;align-items:center;gap:12px}
+.pill .ic{background:#fff;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-size:22px}
+.prog{display:flex;gap:6px;align-items:center}
+.prog i{width:30px;height:10px;border-radius:6px;background:#E3DCCB}
+.prog i.on{background:var(--teal)} .prog i.cur{background:var(--gold)}
+main{max-width:1250px;margin:0 auto;padding:16px 26px 50px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:20px 24px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+h2{color:var(--red);font-size:38px;margin:4px 0 14px}
+button{font:inherit;font-weight:700;border:0;border-radius:18px;padding:10px 26px;cursor:pointer;color:#fff;background:var(--teal);font-size:26px}
+button:hover{filter:brightness(1.07)} button:disabled{opacity:.4;cursor:default}
+button.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)} button.alt{background:var(--blue)}
+.big{font-size:32px;padding:14px 46px;border-radius:40px;box-shadow:0 4px 0 #0E7C76}
+.steps{display:grid;gap:14px;margin:10px 0 18px}
+.step{display:flex;gap:14px;align-items:center;font-size:25px}
+.step b{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.setup{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:10px 0 20px;font-weight:700}
+.setup input{font-weight:700;color:#1F4E6B;width:90px;font:inherit;font-size:26px;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:4px}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.qtype{border-radius:14px;padding:2px 14px;font-weight:700;color:#fff;background:var(--green);font-size:19px}
+.qn{background:var(--ink);color:#fff;border-radius:14px;padding:2px 14px;font-weight:700}
+.q{font-size:30px;font-weight:700;line-height:1.45;margin:6px 0}
+.timer{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
+.timer .bar{flex:1;height:12px;background:#EFEAE0;border-radius:6px;overflow:hidden}
+.timer .bar i{display:block;height:100%;width:100%;background:var(--teal);transition:width 1s linear}
+.timer b{font-size:30px;min-width:50px;text-align:center;direction:ltr}
+.body{display:grid;grid-template-columns:1fr;gap:16px}
+.body.withfig{grid-template-columns:1fr 360px;align-items:start}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{display:flex;align-items:center;gap:14px;border:2px solid var(--line);background:#FBF9F4;border-radius:18px;padding:12px 14px;
+  cursor:pointer;font-size:26px;font-weight:600;transition:.15s;min-height:64px}
+.opt:hover{border-color:var(--teal);transform:translateY(-1px)}
+.opt .l{flex:none;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700}
+.opt.ok{background:#D4EDDA;border-color:var(--green)} .opt.bad{background:#FBE3E3;border-color:var(--red)} .opt.dim{opacity:.45}
+.confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:50;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.ltr{direction:ltr;unicode-bidi:isolate;font-family:"Cambria Math",Cambria,"Times New Roman",serif}
+.fig{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:8px}
+.fb{display:none;margin-top:14px;border-radius:18px;padding:12px 16px;background:var(--mint);border:1.5px solid var(--teal);color:var(--teal-d);font-weight:700;font-size:24px}
+.fb.show{display:block} .fb.bad{background:var(--cream);border-color:var(--gold);color:var(--orange)}
+.count{display:none;margin-top:14px;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between;background:var(--cream);border:1.5px dashed var(--gold);border-radius:18px;padding:10px 16px}
+.count.show{display:flex}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:52px;height:52px;padding:0;border-radius:50%;font-size:30px}
+.stepper output{font-size:36px;font-weight:700;min-width:70px;text-align:center}
+.actions{display:flex;gap:12px;justify-content:space-between;margin-top:16px}
+/* drag & drop classification */
+.bank{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:56px;padding:10px;border:2px dashed var(--line);border-radius:16px}
+.chip{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:6px 14px;font-size:22px;cursor:grab;user-select:none;font-weight:700}
+.chip.sel{background:#FFE9A8}
+.bins{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.bin{border-radius:18px;padding:8px;min-height:110px;color:#fff;font-weight:700;text-align:center;font-size:26px}
+.bin .in{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.bin .chip{color:var(--ink);font-size:19px;cursor:default}
+.chip.right{border-color:var(--green);background:#D4EDDA} .chip.wrong{border-color:var(--red);background:#FBE3E3}
+/* results */
+.res{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:center}
+.ring{width:280px;height:280px;border-radius:50%;display:grid;place-items:center;margin:auto}
+.ring div{width:210px;height:210px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center}
+.ring b{font-size:64px;direction:ltr} .ring span{font-size:22px}
+.bars{display:grid;gap:10px}
+.br{display:grid;grid-template-columns:90px 1fr 70px;gap:10px;align-items:center;font-weight:700}
+.br .t{height:26px;background:#EFEAE0;border-radius:13px;overflow:hidden}
+.br .t i{display:block;height:100%;border-radius:13px}
+.msg{font-size:28px;font-weight:700;color:var(--teal-d);text-align:center;margin-top:12px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.grp{border-radius:14px;padding:4px 8px 6px;text-align:center;color:#fff;position:relative}
+.grp .nm{font-size:19px;font-weight:700;display:block}
+.grp .sc{font-size:32px;font-weight:700;font-family:Calibri,Arial;line-height:1.1}
+.grp .pts{direction:ltr;position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#fff;color:#548235;border-radius:12px;padding:0 10px;font-weight:700;font-size:18px;opacity:0;transition:.3s}
+.grp .pts.show{opacity:1;top:-22px}
+.gbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.gbtns button{font-size:21px;padding:8px 16px;opacity:.55;border:3px solid transparent}
+.gbtns button.on{opacity:1;border-color:#fff;box-shadow:0 0 0 3px #548235}
+.rank{display:grid;gap:8px}
+.rank div{display:flex;justify-content:space-between;align-items:center;border-radius:14px;padding:6px 16px;color:#fff;font-size:24px;font-weight:700}
+.credit{position:fixed;left:10px;bottom:6px;font-size:13px;color:#9aa6ad}
+.hidden{display:none!important}
+@media (max-width:1000px){.body.withfig{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.res{grid-template-columns:1fr}.bins{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="pill"><span class="ic">🏆</span>التقويم الختامي التفاعلي</div>
+  <div style="display:flex;gap:12px;align-items:center"><button id="mute" class="ghost" style="font-size:22px;padding:6px 14px" title="الصوت">🔊</button><div class="prog" id="prog"></div></div>
+</header>
+<main>
+  <!-- start -->
+  <section class="card" id="start">
+    <h2>هل أتقنتِ التعادل؟ أثبتي فهمك!</h2>
+    <div class="steps">
+      <div class="step"><b style="background:#2E6FD8">1</b>أربعة أسئلة بنمط التحصيلي: نواتج التعادل، المعادلة الأيونية، قراءة رسم بياني، والملح الناتج.</div>
+      <div class="step"><b style="background:#D9A23A">2</b>تحلّ كل مجموعة السؤال، وأسرع مجموعة ترفع بطاقة الإجابة الصحيحة تكسب أعلى النقاط.</div>
+      <div class="step"><b style="background:#159C94">3</b>النقاط حسب السرعة: الأولى 20، الثانية 15، الثالثة 10، الرابعة 5… وفي النهاية تظهر الفائزة ونسبة إتقان الفصل.</div>
+    </div>
+    <div class="setup">أسماء المجموعات:
+      <input class="gname" value="المجموعة 1" style="width:170px;border-color:#2E6FD8"><input class="gname" value="المجموعة 2" style="width:170px;border-color:#159C94">
+      <input class="gname" value="المجموعة 3" style="width:170px;border-color:#D9A23A"><input class="gname" value="المجموعة 4" style="width:170px;border-color:#C55A11"></div>
+    <div class="setup">وقت التشاور لكل سؤال: <input id="secs" type="number" min="5" max="90" value="30"> ثانية</div>
+    <div style="text-align:center"><button class="big" id="go">ابدئي التقويم ◀</button></div>
+  </section>
+
+  <!-- question -->
+  <section class="card hidden" id="qcard">
+    <div class="board" id="board"></div>
+    <div class="qtop"><span class="qn" id="qn"></span><span class="qtype" id="qtype"></span></div>
+    <div class="q" id="qt"></div>
+    <div class="timer"><div class="bar"><i id="tbar"></i></div><b id="tnum"></b></div>
+    <div class="body" id="body"></div>
+    <div class="fb" id="fb"></div>
+    <div class="count" id="count">
+      <span>انقري المجموعات التي أجابت صحيحًا <b>بترتيب سرعتها</b>:<br>الأولى 20 • الثانية 15 • الثالثة 10 • الرابعة 5</span>
+      <div class="gbtns" id="gbtns"></div>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="reveal">إظهار الإجابة</button>
+      <button id="next" disabled>التالي ◀</button>
+    </div>
+  </section>
+
+  <!-- results -->
+  <section class="card hidden" id="results">
+    <h2 id="winner"></h2>
+    <div class="rank" id="rank"></div>
+    <h3 style="color:#0E7C76;margin:18px 0 6px">نسبة إتقان الفصل لكل سؤال</h3>
+    <div class="res">
+      <div class="ring" id="ring"><div><span>متوسط الإتقان</span><b id="pct">0%</b></div></div>
+      <div class="bars" id="bars"></div>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div style="text-align:center;margin-top:14px"><button class="ghost" id="again">↺ إعادة التقويم</button></div>
+  </section>
+</main>
+
+<script>
+const ion=(s)=>`<span class="ltr">${s}</span>`;
+function curve(type){ // pH curve SVG, 50 mL 0.1 M acid + 0.1 M NaOH
+  const Kw=1e-14,Ka=1.8e-4;
+  const pH=v=>{const Vt=(50+v)/1000,nA=0.005,nB=0.0001*v;
+    if(type==='s'){const d=nA-nB;if(Math.abs(d)<1e-12)return 7;if(d>0){const h=d/Vt;return -Math.log10(h/2+Math.sqrt(h*h/4+Kw));}const o=-d/Vt;return 14+Math.log10(o/2+Math.sqrt(o*o/4+Kw));}
+    const Ct=nA/Vt,Na=nB/Vt;let lo=-14,hi=0;for(let i=0;i<70;i++){const m=(lo+hi)/2,h=10**m;(h+Na-Kw/h-Ct*Ka/(Ka+h))>0?hi=m:lo=m;}return -(lo+hi)/2;};
+  const X=v=>50+v/80*350,Y=p=>20+(1-p/14)*250;let d='';
+  for(let v=0;v<=80;v+=(v>44&&v<56)?.1:.5){d+=(v?'L':'M')+X(v).toFixed(1)+' '+Y(pH(v)).toFixed(1);}
+  let g='';for(let p=0;p<=14;p+=2)g+=`<line x1="50" x2="400" y1="${Y(p)}" y2="${Y(p)}" stroke="#EFEAE0"/><text x="42" y="${Y(p)+5}" font-size="13" text-anchor="end" fill="#6b7d88">${p}</text>`;
+  for(let v=0;v<=80;v+=20)g+=`<text x="${X(v)}" y="292" font-size="13" text-anchor="middle" fill="#6b7d88">${v}</text>`;
+  const pe=pH(50);
+  return `<svg viewBox="0 0 410 320" width="100%" style="direction:ltr;font-family:Calibri,Arial">${g}
+    <line x1="50" y1="270" x2="400" y2="270" stroke="#1F4E6B"/><line x1="50" y1="20" x2="50" y2="270" stroke="#1F4E6B"/>
+    <path d="${d}" fill="none" stroke="${type==='s'?'#B71C1C':'#2E6FD8'}" stroke-width="3.5"/>
+    <circle cx="${X(50)}" cy="${Y(pe)}" r="12" fill="none" stroke="#D9A23A" stroke-width="4"/>
+    <text x="${X(50)+16}" y="${Y(pe)+22}" font-size="18" font-weight="700" fill="#C55A11">؟</text>
+    <text x="225" y="314" font-size="14" text-anchor="middle" fill="#1F4E6B">NaOH (mL)</text>
+    <text x="16" y="150" font-size="15" fill="#1F4E6B" transform="rotate(-90 16 150)" text-anchor="middle">pH</text></svg>`;
+}
+const QS=[
+ {type:'تحصيلي كيمياء',q:'نواتج تفاعل حمض الكبريتيك '+ion('H<sub>2</sub>SO<sub>4</sub>')+' مع هيدروكسيد البوتاسيوم '+ion('KOH')+' هي:',o:['ملح '+ion('K<sub>2</sub>SO<sub>4</sub>')+' وماء '+ion('H<sub>2</sub>O'),'ملح '+ion('K<sub>2</sub>SO<sub>4</sub>')+' وغاز الهيدروجين '+ion('H<sub>2</sub>'),ion('K<sub>2</sub>O')+' و '+ion('H<sub>2</sub>SO<sub>4</sub>'),ion('KH')+' و '+ion('SO<sub>4</sub>')+' فقط'],a:0,e:'حمض + قاعدة ← ملح + ماء: الملح كبريتات البوتاسيوم K₂SO₄ والماء H₂O.'},
+ {type:'تحصيلي كيمياء',q:'المعادلة الأيونية النهائية لتعادل HNO<sub>3</sub> مع NaOH هي:',o:[ion('Na<sup>+</sup> + NO<sub>3</sub><sup>−</sup> → NaNO<sub>3</sub>'),ion('HNO<sub>3</sub> → H<sup>+</sup> + NO<sub>3</sub><sup>−</sup>'),ion('H<sup>+</sup> + OH<sup>−</sup> → H<sub>2</sub>O'),ion('NaOH → Na<sup>+</sup> + OH<sup>−</sup>')],a:2,e:'Na⁺ و NO₃⁻ أيونات متفرجة تُحذف، فيبقى H⁺ + OH⁻ → H₂O.'},
+ {type:'تحصيلي كيمياء',fig:()=>curve('s'),q:'يمثل المنحنى تغيّر pH عند إضافة NaOH إلى HCl. ما قيمة pH عند النقطة المحددة (نقطة التعادل)؟',o:['1','7','10','14'],a:1,e:'عند نقطة التعادل لحمض قوي مع قاعدة قوية يتساوى عدد مولات H⁺ و OH⁻ فتكون pH = 7.'},
+ {type:'تحصيلي كيمياء',q:'الملح الناتج من تعادل حمض الهيدروكلوريك '+ion('HCl')+' مع هيدروكسيد الصوديوم '+ion('NaOH')+' هو:',o:['هيدروكسيد الصوديوم '+ion('NaOH'),'كلوريد الصوديوم '+ion('NaCl'),'الماء '+ion('H<sub>2</sub>O'),'غاز الهيدروجين '+ion('H<sub>2</sub>')],a:1,e:'الملح يتكون من الأيون الموجب للقاعدة Na⁺ والأيون السالب للحمض Cl⁻ ← NaCl.'}
+];
+const $=id=>document.getElementById(id);
+// ===== Sound effects (Web Audio – works offline) =====
+let AC=null, muted=false;
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
+function tone(freq,start,dur,type='sine',vol=.25,slideTo=null){
+  if(muted) return; const c=ac(), o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,start); if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo,start+dur);
+  g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(vol,start+0.01); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(g).connect(c.destination); o.start(start); o.stop(start+dur+0.02);
+}
+const now=()=>ac().currentTime;
+function soundStart(){ const t=now(); tone(660,t,0.15,'triangle',.22); tone(990,t+0.12,0.25,'triangle',.2); }
+function soundTick(){ tone(1400,now(),0.05,'square',.1); }
+function soundTimeUp(){ const t=now(); tone(880,t,0.18,'square',.15); tone(880,t+0.25,0.18,'square',.15); tone(660,t+0.5,0.35,'square',.15); }
+function soundRight(){ const t=now(); [523,659,784,1047].forEach((f,i)=>tone(f,t+i*0.11,0.28,'sine',.3)); }
+function soundWrong(){ const t=now(); tone(300,t,0.28,'sawtooth',.18,200); tone(200,t+0.3,0.45,'sawtooth',.18,120); }
+function soundReveal(){ const t=now(); tone(784,t,0.3,'triangle',.22); }
+function soundFanfare(){ const t=now(); [[523,0],[659,.15],[784,.3],[1047,.45],[784,.65],[1047,.8]].forEach(([f,d])=>tone(f,t+d,0.35,'triangle',.28)); }
+function confetti(){ const c=['#2E6FD8','#159C94','#D9A23A','#C55A11','#D6336C','#548235'];
+  for(let k=0;k<60;k++){const e=document.createElement('i');e.className='confetti';e.style.left=Math.random()*100+'vw';e.style.background=c[k%c.length];e.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),3000);} }
+const L=['أ','ب','ج','د'],LC=['#2E6FD8','#159C94','#D9A23A','#C55A11'];
+let i=0, secs=30, scores=[], tmr=null, revealed=false, sel=null, correctSet=new Set(), order=[], base=[];
+const SPEED=[20,15,10,5];
+const groups=[{n:'المجموعة 1',c:'#2E6FD8',s:0},{n:'المجموعة 2',c:'#159C94',s:0},{n:'المجموعة 3',c:'#D9A23A',s:0},{n:'المجموعة 4',c:'#C55A11',s:0}];
+function renderBoard(flash){
+  $('board').innerHTML=groups.map((g,k)=>`<div class="grp" style="background:${g.c}"><span class="pts${flash===k?' show':''}" id="pts${k}">+10</span><span class="nm">${g.n}</span><span class="sc">${g.s}</span></div>`).join('');
+  if(flash!=null) setTimeout(()=>{const e=$('pts'+flash); if(e) e.classList.remove('show');},1000);
+}
+function applyOrder(){ groups.forEach((g,k)=>{ const pos=order.indexOf(k); g.s=base[k]+(pos>=0?SPEED[pos]:0); }); correctSet=new Set(order); }
+function renderGbtns(){
+  $('gbtns').innerHTML=groups.map((g,k)=>{ const pos=order.indexOf(k);
+    return `<button data-k="${k}" class="${pos>=0?'on':''}" style="background:${g.c}">${pos>=0?['🥇','🥈','🥉','🎖️'][pos]+' ':''}${g.n}${pos>=0?' <bdi dir="ltr">+'+SPEED[pos]+'</bdi>':''}</button>`; }).join('');
+  $('gbtns').querySelectorAll('button').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k, pos=order.indexOf(k);
+    if(pos>=0){ order.splice(pos,1); applyOrder(); renderBoard(); }
+    else { order.push(k); applyOrder(); soundRight(); renderBoard(k); const e=$('pts'+k); if(e) e.textContent='+'+SPEED[order.length-1]; }
+    renderGbtns(); });
+}
+function progress(){ $('prog').innerHTML=QS.map((_,k)=>`<i class="${k<i?'on':k===i?'cur':''}"></i>`).join(''); }
+function startTimer(){
+  clearInterval(tmr); let t=secs; const bar=$('tbar'); bar.style.transition='none'; bar.style.width='100%'; bar.style.background='#159C94';
+  $('tnum').textContent=t; requestAnimationFrame(()=>bar.style.transition='width 1s linear');
+  tmr=setInterval(()=>{t--; $('tnum').textContent=Math.max(t,0); bar.style.width=(Math.max(t,0)/secs*100)+'%'; if(t<=5){bar.style.background='#C55A11'; if(t>0) soundTick();} if(t<=0){clearInterval(tmr);$('tnum').textContent='⏰';soundTimeUp();}},1000);
+}
+function render(){
+  const d=QS[i]; revealed=false; sel=null; correctSet=new Set(); order=[]; base=groups.map(g=>g.s); renderBoard(); renderGbtns();
+  $('qn').textContent='السؤال '+(i+1)+' من '+QS.length; $('qtype').textContent=d.type; $('qt').innerHTML=d.q;
+  $('fb').className='fb'; $('count').className='count'; $('next').disabled=true; $('reveal').disabled=false;
+  const body=$('body');
+  if(d.drag){
+    body.className='body';
+    body.innerHTML=`<div class="bank" id="bank">${d.items.map((it,k)=>`<div class="chip ltr" draggable="true" data-k="${k}">${it[0]}</div>`).join('')}</div>
+      <div class="bins">${d.bins.map((b,k)=>`<div class="bin" data-b="${k}" style="background:${b[1]}">${b[0]}<div class="in"></div></div>`).join('')}</div>`;
+    body.querySelectorAll('.chip').forEach(c=>{
+      c.ondragstart=e=>e.dataTransfer.setData('k',c.dataset.k);
+      c.onclick=()=>{ if(revealed) return; body.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); sel=c; };
+    });
+    body.querySelectorAll('.bin').forEach(b=>{
+      b.ondragover=e=>e.preventDefault();
+      b.ondrop=e=>{e.preventDefault(); const c=body.querySelector(`.chip[data-k="${e.dataTransfer.getData('k')}"]`); if(c&&!revealed) b.querySelector('.in').appendChild(c);};
+      b.onclick=()=>{ if(sel&&!revealed){ b.querySelector('.in').appendChild(sel); sel.classList.remove('sel'); sel=null; } };
+    });
+  } else {
+    body.className='body'+(d.fig?' withfig':'');
+    body.innerHTML=`<div class="opts">${d.o.map((t,k)=>`<div class="opt" data-k="${k}"><span class="l" style="background:${LC[k]}">${L[k]}</span><span>${t}</span></div>`).join('')}</div>`+(d.fig?`<div class="fig">${d.fig()}</div>`:'');
+    body.querySelectorAll('.opt').forEach(o=>o.onclick=()=>reveal(+o.dataset.k));
+  }
+  progress(); startTimer();
+}
+function reveal(k){
+  if(revealed) return; revealed=true; clearInterval(tmr);
+  const d=QS[i];
+  if(d.drag){
+    // place all chips in correct bins and mark
+    const body=$('body');
+    body.querySelectorAll('.chip').forEach(c=>{
+      const want=d.items[+c.dataset.k][1]; const bin=c.closest('.bin');
+      if(bin && +bin.dataset.b===want) c.classList.add('right'); else { if(bin) c.classList.add('wrong'); setTimeout(()=>{c.classList.remove('wrong');c.classList.add('right');body.querySelector(`.bin[data-b="${want}"] .in`).appendChild(c);},bin?900:200); }
+    });
+  } else {
+    document.querySelectorAll('.opt').forEach((o,j)=>{ if(j===d.a) o.classList.add('ok'); else if(j===k) o.classList.add('bad'); else o.classList.add('dim'); });
+    if(k<0) soundReveal(); else if(k===d.a){ soundRight(); confetti(); } else soundWrong();
+  }
+  $('fb').innerHTML=(k>=0&&k!==d.a?'✘ الإجابة الصحيحة هي ('+L[d.a]+'). ':'✔ ')+d.e; $('fb').className='fb show'+(k>=0&&k!==d.a?' bad':'');
+  $('count').className='count show'; $('reveal').disabled=true; $('next').disabled=false;
+  $('next').textContent = i===QS.length-1 ? 'عرض النتيجة 🏆' : 'التالي ◀';
+}
+$('reveal').onclick=()=>reveal(-1);
+$('next').onclick=()=>{ scores[i]=correctSet.size; i++; if(i<QS.length) render(); else results(); };
+$('go').onclick=()=>{ secs=Math.max(5,+$('secs').value||30); i=0; scores=[]; document.querySelectorAll('.gname').forEach((e,k)=>{groups[k].n=e.value.trim()||('المجموعة '+(k+1)); groups[k].s=0;});
+  $('start').classList.add('hidden'); $('results').classList.add('hidden'); $('qcard').classList.remove('hidden'); soundStart(); render(); };
+$('again').onclick=()=>{ $('results').classList.add('hidden'); $('start').classList.remove('hidden'); i=0; progress(); };
+function results(){
+  clearInterval(tmr); $('qcard').classList.add('hidden'); $('results').classList.remove('hidden'); i=QS.length; progress(); soundFanfare(); confetti();
+  const order=groups.map(g=>({...g})).sort((a,b)=>b.s-a.s), medal=['🥇','🥈','🥉','🎖️'];
+  const tie=order.filter(g=>g.s===order[0].s);
+  $('winner').innerHTML = tie.length>1 ? '🏆 تعادل في المركز الأول: '+tie.map(g=>g.n).join(' و ') : '🏆 المجموعة الفائزة: '+order[0].n;
+  $('rank').innerHTML=order.map((g,k)=>`<div style="background:${g.c}"><span>${medal[order.filter(x=>x.s>g.s).length]} ${g.n}</span><span style="font-family:Calibri">${g.s}</span></div>`).join('');
+  const per=scores.map(s=>Math.round(s/groups.length*100)); const avg=Math.round(per.reduce((a,b)=>a+b,0)/per.length);
+  const col=p=>p>=80?'#548235':p>=60?'#D9A23A':'#C55A11';
+  $('pct').textContent=avg+'%';
+  $('ring').style.background=`conic-gradient(${col(avg)} ${avg*3.6}deg,#EFEAE0 0)`;
+  $('bars').innerHTML=per.map((p,k)=>`<div class="br"><span>س ${k+1}</span><div class="t"><i style="width:${p}%;background:${col(p)}"></i></div><span style="direction:ltr">${p}%</span></div>`).join('');
+  const weak=per.map((p,k)=>[p,k]).filter(x=>x[0]<60).map(x=>'س'+(x[1]+1));
+  $('msg').innerHTML = avg>=80 ? '🎉 ممتاز! تحقق هدف الدرس لدى معظم الطالبات.' : avg>=60 ? '👍 جيد، مع حاجة لمراجعة بعض النقاط.' : '📌 نحتاج إلى معالجة قبل الانتقال للدرس التالي.';
+  if(weak.length) $('msg').innerHTML += `<br><span style="color:#C55A11;font-size:24px">أسئلة تحتاج إلى معالجة: ${weak.join('، ')}</span>`;
+}
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';};
+progress();
+</script>
+</body>
+</html>

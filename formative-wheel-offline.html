@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>عجلة التقويم البنائي – التعادل</title>
+<style>
+:root{--bg:#F8F5EE;--card:#fff;--line:#E3DCCB;--ink:#1F4E6B;--teal:#159C94;--teal-d:#0E7C76;--peach:#F2AE85;
+  --red:#B71C1C;--gold:#D9A23A;--blue:#2E6FD8;--orange:#C55A11;--green:#548235;--mint:#E3F4EC;--cream:#FFF8EC}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Sakkal Majalla","Traditional Arabic","Segoe UI",Tahoma,"Amiri",sans-serif}
+body{font-size:22px;overflow-x:hidden}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px 0}
+.pill{background:var(--peach);color:#fff;border-radius:18px;padding:6px 26px;font-weight:700;font-size:34px;
+  outline:2px dashed #fff;outline-offset:-7px;display:flex;align-items:center;gap:12px}
+.pill .ic{background:#fff;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-size:22px}
+.sub{color:var(--red);font-weight:700;font-size:30px}
+main{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;padding:12px 24px 40px;align-items:stretch}
+.wheelbox{gap:10px!important}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:16px 18px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.wheelbox{display:flex;flex-direction:column;align-items:center;gap:14px}
+.wrap{position:relative;width:min(520px,44vw,64vh);aspect-ratio:1}
+#wheel{pointer-events:none;width:100%;height:100%;transition:transform 5s cubic-bezier(.12,.75,.12,1);filter:drop-shadow(0 6px 10px rgba(0,0,0,.12))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;
+  border-left:22px solid transparent;border-right:22px solid transparent;border-top:44px solid var(--red);filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));z-index:2}
+.hub{position:absolute;inset:0;margin:auto;width:20%;height:20%;border-radius:50%;background:#fff;border:6px solid var(--ink);
+  display:grid;place-items:center;font-weight:700;font-size:22px;cursor:pointer;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+button{font:inherit;font-weight:700;border:0;border-radius:16px;padding:10px 22px;cursor:pointer;color:#fff;background:var(--teal);font-size:24px}
+button:hover{filter:brightness(1.07)} button:disabled{opacity:.45;cursor:default}
+button.alt{background:var(--blue)} button.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)} button.gold{background:var(--gold)}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.qhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.qnum{background:var(--ink);color:#fff;border-radius:14px;padding:2px 14px;font-weight:700}
+.tag{border-radius:14px;padding:2px 12px;font-weight:700;color:#fff;background:var(--green);font-size:18px}
+.q{font-size:30px;font-weight:700;line-height:1.5;min-height:92px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.opt{display:flex;align-items:center;gap:12px;border:2px solid var(--line);background:#FBF9F4;border-radius:16px;padding:10px 12px;
+  cursor:pointer;font-size:24px;color:var(--ink);text-align:right;font-weight:600;transition:.15s}
+.opt:hover{border-color:var(--teal)}
+.opt .l{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700}
+.opt.ok{background:#D4EDDA;border-color:var(--green)} .opt.no{background:#FBE3E3;border-color:var(--red)}
+.ltr{direction:ltr;unicode-bidi:isolate;font-family:"Cambria Math",Cambria,"Times New Roman",serif}
+.fb{margin-top:12px;border-radius:16px;padding:10px 14px;font-size:22px;font-weight:700;display:none}
+.fb.show{display:block} .fb.good{background:var(--mint);color:var(--teal-d);border:1.5px solid var(--teal)} .fb.bad{background:var(--cream);color:var(--orange);border:1.5px solid var(--gold)}
+.timer{height:10px;background:#EFEAE0;border-radius:6px;overflow:hidden;margin:6px 0 2px}
+.timer i{display:block;height:100%;width:100%;background:var(--teal);transition:width 1s linear}
+.empty{color:#8a98a1;text-align:center;padding:80px 10px;font-size:30px}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-weight:700}
+.stats span{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:4px 14px}
+.picker{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.picker input{width:80px;font:inherit;font-size:22px;text-align:center;border:1.5px solid var(--line);border-radius:12px;padding:4px}
+.student{font-size:44px;font-weight:700;color:var(--blue);min-width:70px;text-align:center}
+.credit{position:fixed;left:10px;bottom:6px;font-size:13px;color:#9aa6ad}
+.confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:50;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.turn{font-size:26px;font-weight:700;color:var(--ink);background:var(--cream);border:1.5px dashed var(--gold);border-radius:16px;padding:4px 18px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;margin-top:14px}
+.grp{border-radius:16px;padding:6px 8px 8px;text-align:center;color:#fff;transition:.25s;opacity:.8;position:relative}
+.grp.active{opacity:1;transform:translateY(-4px) scale(1.04);box-shadow:0 6px 14px rgba(0,0,0,.2);outline:4px solid #fff;outline-offset:-8px}
+.grp .nm{font-size:20px;font-weight:700;outline:none;display:block;min-height:30px;cursor:text}
+.grp .sc{font-size:40px;font-weight:700;font-family:Calibri,Arial;line-height:1}
+.grp .pts{direction:ltr;position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#fff;color:var(--green);border-radius:12px;padding:0 10px;font-weight:700;font-size:20px;opacity:0;transition:.3s}
+.grp .pts.show{opacity:1;top:-26px}
+.steal{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.buzz{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.buzz button{font-size:20px;padding:8px 6px;border:3px solid transparent;transition:.15s}
+.buzz button.sel{border-color:#fff;box-shadow:0 0 0 4px #1F4E6B;transform:scale(1.05)}
+.buzz button.locked{opacity:.3;text-decoration:line-through;cursor:default}
+.buzzhint{text-align:center;font-weight:700;color:#C55A11;margin-top:8px;font-size:21px}
+.steal button{font-size:18px;padding:6px 12px}
+.rank{display:grid;gap:10px;margin-top:10px}
+.rank div{display:flex;justify-content:space-between;align-items:center;border-radius:14px;padding:8px 16px;color:#fff;font-size:26px;font-weight:700}
+@media (max-width:1000px){main{grid-template-columns:1fr}.wrap{width:min(520px,90vw)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="pill"><span class="ic">🎡</span>عجلة التقويم البنائي</div>
+  <div class="sub">تنافس المجموعات: الأسرع في الإجابة الصحيحة يفوز!</div>
+</header>
+<main>
+  <section class="card wheelbox">
+    <div class="wrap">
+      <div class="pointer"></div>
+      <svg id="wheel" viewBox="-200 -200 400 400"></svg>
+      <div class="hub" id="hub">أديري</div>
+    </div>
+    <div class="row">
+      <button id="spin">🎡 أديري العجلة</button>
+      <button id="reset" class="ghost">↺ من جديد</button>
+      <button id="mute" class="ghost" title="الصوت">🔊</button>
+    </div>
+  </section>
+
+  <section class="card" id="panel">
+    <div class="board" id="board"></div>
+    <div style="text-align:center;margin:12px 0 6px"><span class="turn" id="turn"></span></div>
+    <div class="empty" id="empty">🎡<br>أديري العجلة ليظهر السؤال هنا</div>
+    <div id="qbox" style="display:none">
+      <div class="qhead"><span class="qnum" id="qn"></span><span class="tag" id="qtag">تحصيلي كيمياء</span></div>
+      <div class="timer"><i id="tbar"></i></div>
+      <div class="q" id="qt"></div>
+      <div class="opts" id="opts"></div>
+      <div class="fb" id="fb"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const Q=[
+ {q:'ما المقصود بتفاعل التعادل؟',o:['تفاعل حمض مع قاعدة لينتج ملحًا وماءً','تفكك مركب إلى عناصره الأولية','تفاعل مادة مع الأكسجين لإنتاج طاقة','ذوبان الملح في الماء'],a:0,e:'التعادل: حمض + قاعدة ← ملح + ماء.'},
+ {q:'الملح مركب أيوني يتكوّن من:',o:['أيون موجب من الحمض وأيون سالب من القاعدة','أيون موجب من القاعدة وأيون سالب من الحمض','أيونات H⁺ و OH⁻ فقط','جزيئات ماء'],a:1,e:'مثل NaCl: الأيون Na⁺ من القاعدة NaOH، والأيون Cl⁻ من الحمض HCl.'},
+ {q:'نواتج تفاعل حمض قوي مع قاعدة قوية (مثل <span class="ltr">HCl</span> مع <span class="ltr">NaOH</span>):',o:['ملح وماء <span class="ltr">(NaCl + H<sub>2</sub>O)</span>','ملح وغاز الهيدروجين','حمض جديد وقاعدة جديدة','ماء فقط'],a:0,e:'<span class="ltr">HCl + NaOH → NaCl + H<sub>2</sub>O</span>'},
+ {q:'يُصنَّف تفاعل التعادل ضمن تفاعلات:',o:['الاحتراق','التفكك','الإحلال المزدوج','الإحلال البسيط'],a:2,e:'<span class="ltr">AB + CD → AD + CB</span>: تتبادل الأيونات الموجبة مواقعها.'}
+];
+const COLORS=['#2E6FD8','#159C94','#D9A23A','#C55A11'];
+const N=Q.length, seg=360/N;
+// ===== Sound effects (Web Audio – works offline) =====
+let AC=null, muted=false;
+function ac(){ if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); return AC; }
+function tone(freq,start,dur,type='sine',vol=.25,slideTo=null){
+  if(muted) return; const c=ac(), o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq,start); if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo,start+dur);
+  g.gain.setValueAtTime(0.0001,start); g.gain.exponentialRampToValueAtTime(vol,start+0.01); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(g).connect(c.destination); o.start(start); o.stop(start+dur+0.02);
+}
+function tick(t){ tone(1500,t,0.035,'square',0.12); }
+function soundStop(){ const t=ac().currentTime; tone(880,t,0.25,'triangle',.25); tone(1320,t+0.08,0.3,'triangle',.18); }
+function soundRight(){ const t=ac().currentTime; [523,659,784,1047].forEach((f,i)=>tone(f,t+i*0.11,0.28,'sine',.3)); }
+function soundWrong(){ const t=ac().currentTime; tone(300,t,0.28,'sawtooth',.18,200); tone(200,t+0.3,0.45,'sawtooth',.18,120); }
+// cubic-bezier(.12,.75,.12,1) progress at time fraction x
+function ease(x){ const p1x=.12,p1y=.75,p2x=.12,p2y=1; let lo=0,hi=1,u=x;
+  for(let i=0;i<30;i++){ u=(lo+hi)/2; const bx=3*(1-u)*(1-u)*u*p1x+3*(1-u)*u*u*p2x+u*u*u; if(bx<x) lo=u; else hi=u; }
+  return 3*(1-u)*(1-u)*u*p1y+3*(1-u)*u*u*p2y+u*u*u; }
+function scheduleTicks(from,to,durMs){
+  if(muted) return; const c=ac(), t0=c.currentTime, total=to-from; let next=Math.ceil(from/seg)*seg;
+  for(let k=1;k<=500;k++){ const x=k/500, ang=from+total*ease(x);
+    while(next<=ang && next<to){ tick(t0+x*durMs/1000); next+=seg; } }
+}
+
+let rot=0, used=new Set(), spinning=false, right=0, current=-1, answered=false, tmr=null;
+const $=id=>document.getElementById(id);
+
+
+function polar(r,deg){const a=(deg-90)*Math.PI/180;return [r*Math.cos(a),r*Math.sin(a)];}
+
+// ===== Groups =====
+const groups=[{n:'المجموعة 1',c:'#2E6FD8',s:0},{n:'المجموعة 2',c:'#159C94',s:0},{n:'المجموعة 3',c:'#D9A23A',s:0},{n:'المجموعة 4',c:'#C55A11',s:0}];
+let turn=-1, buzzed=null, locked=new Set();
+function renderBoard(){
+  $('board').innerHTML=groups.map((g,k)=>`<div class="grp${k===buzzed?' active':''}" style="background:${g.c}"><span class="pts" id="pts${k}">+10</span><span class="nm" contenteditable="true" data-k="${k}">${g.n}</span><span class="sc">${g.s}</span></div>`).join('');
+  document.querySelectorAll('.grp .nm').forEach(el=>{el.oninput=()=>{groups[+el.dataset.k].n=el.textContent.trim()||('المجموعة '+(+el.dataset.k+1)); updateTurn();};});
+  updateTurn();
+}
+function updateTurn(){ $('turn').innerHTML = used.size<N ? '⚡ أسرع مجموعة ترفع يدها وتجيب صحيحًا تكسب 10 نقاط' : '🏁 انتهت الجولة'; }
+function addPoints(k,p){ groups[k].s+=p; renderBoard(); const e=$('pts'+k); if(e){ e.textContent='+'+p; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),1200);} }
+function soundFanfare(){ const t=ac().currentTime; [[523,0],[659,.15],[784,.3],[1047,.45],[784,.65],[1047,.8]].forEach(([f,d])=>tone(f,t+d,0.35,'triangle',.28)); }
+function finale(){
+  const order=groups.map((g,k)=>({...g,k})).sort((a,b)=>b.s-a.s);
+  const medal=['🥇','🥈','🥉','🎖️'];
+  $('qbox').style.display='none'; $('empty').style.display='block'; $('empty').style.padding='20px 10px';
+  const tie=order.filter(g=>g.s===order[0].s);
+  $('empty').innerHTML=`<div style="font-size:40px;color:#B71C1C;font-weight:700">🏆 ${tie.length>1?'تعادل في المركز الأول: '+tie.map(g=>g.n).join(' و '):'المجموعة الفائزة: '+order[0].n}</div>
+    <div class="rank">${order.map((g,i)=>`<div style="background:${g.c}"><span>${medal[order.filter(x=>x.s>g.s).length]} ${g.n}</span><span style="font-family:Calibri">${g.s}</span></div>`).join('')}</div>`;
+  soundFanfare(); confetti(); setTimeout(confetti,900);
+}
+function drawWheel(){
+  let s='<circle r="198" fill="#fff" stroke="#1F4E6B" stroke-width="6"/>';
+  for(let i=0;i<N;i++){
+    const a0=i*seg,a1=(i+1)*seg,[x0,y0]=polar(190,a0),[x1,y1]=polar(190,a1);
+    const col=used.has(i)?'#D9D4C7':(Q[i].gold?'#E0A800':COLORS[i%COLORS.length]);
+    s+=`<path d="M0 0 L${x0} ${y0} A190 190 0 0 1 ${x1} ${y1} Z" fill="${col}" stroke="#fff" stroke-width="3"/>`;
+    const [tx,ty]=polar(130,a0+seg/2);
+    const label=Q[i].gold?'⭐':(i+1);
+    s+=`<text x="${tx}" y="${ty}" fill="#fff" font-size="${Q[i].gold?34:64}" font-weight="700" text-anchor="middle" dominant-baseline="central"
+      font-family="Calibri,Arial" transform="rotate(${a0+seg/2} ${tx} ${ty})">${used.has(i)?'✔':label}</text>`;
+  }
+  for(let i=0;i<N*2;i++){const [x,y]=polar(184,i*seg/2);s+=`<circle cx="${x}" cy="${y}" r="4" fill="#FFF8EC"/>`;}
+  $('wheel').innerHTML=s;
+}
+function spin(){
+  if(spinning) return;
+  const left=[...Array(N).keys()].filter(i=>!used.has(i));
+  if(!left.length){ finale(); return; }
+  spinning=true; $('spin').disabled=true;
+  const pick=left[Math.floor(Math.random()*left.length)];
+  const centre=pick*seg+seg/2;
+  const jitter=(Math.random()-.5)*seg*.6;
+  const target=360-centre+jitter;
+  const base=rot-(rot%360);
+  const from=rot;
+  rot=base+360*6+target;
+  scheduleTicks(from,rot,5000);
+  $('wheel').style.transform=`rotate(${rot}deg)`;
+  setTimeout(()=>{spinning=false;$('spin').disabled=false;soundStop();show(pick);},5100);
+}
+function show(i){
+  current=i; answered=false;
+  const d=Q[i];
+  $('empty').style.display='none'; $('qbox').style.display='block';
+  $('qn').textContent='السؤال '+(i+1); buzzed=null; locked=new Set();
+  $('qtag').textContent=d.gold?'نقطة ذهبية للإجابة الصحيحة':'تحصيلي كيمياء';
+  $('qtag').style.background=d.gold?'#D9A23A':'#548235';
+  $('qt').innerHTML=d.q.replace(/^⭐ سؤال النقطة الذهبية: /,'');
+  const L=['أ','ب','ج','د'],LC=['#2E6FD8','#159C94','#D9A23A','#C55A11'];
+  $('opts').innerHTML=d.o.map((t,k)=>`<div class="opt" data-k="${k}"><span class="l" style="background:${LC[k]}">${L[k]}</span><span>${t}</span></div>`).join('');
+  document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>choose(+el.dataset.k));
+  $('fb').className='fb'; renderBuzz();
+  // 20-second thinking timer
+  clearInterval(tmr); let t=20; const bar=$('tbar'); bar.style.transition='none'; bar.style.width='100%'; bar.style.background='#159C94';
+  requestAnimationFrame(()=>{bar.style.transition='width 1s linear';});
+  tmr=setInterval(()=>{t--; bar.style.width=(t/20*100)+'%'; if(t<=5) bar.style.background='#C55A11'; if(t<=0) clearInterval(tmr);},1000);
+}
+function soundBuzz(){ const t=ac().currentTime; tone(520,t,0.18,'square',.2); tone(780,t+0.12,0.22,'square',.18); }
+function renderBuzz(msg){
+  let el=$('buzz'); if(!el){ el=document.createElement('div'); el.id='buzz'; $('qbox').insertBefore(el,$('fb')); }
+  if(answered){ el.innerHTML=''; return; }
+  el.innerHTML=`<div class="buzzhint">${msg||'🙋 من رفعت يدها أولًا؟ انقري مجموعتها، ثم انقري الإجابة التي قالتها'}</div><div class="buzz">`+
+    groups.map((g,k)=>`<button data-k="${k}" class="${k===buzzed?'sel':''} ${locked.has(k)?'locked':''}" style="background:${g.c}">🙋 ${g.n}</button>`).join('')+'</div>';
+  el.querySelectorAll('.buzz button').forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; if(locked.has(k)||answered) return;
+    buzzed=k; soundBuzz(); renderBoard(); renderBuzz('🎤 '+groups[k].n+' تجيب الآن… انقري الإجابة التي قالتها'); });
+}
+function finishQ(){ answered=true; clearInterval(tmr); used.add(current); drawWheel(); buzzed=null; renderBoard(); renderBuzz(); if(used.size>=N) setTimeout(finale,2500); }
+function choose(k){
+  if(answered) return;
+  if(buzzed===null){ renderBuzz('☝️ اختاري أولًا المجموعة التي رفعت يدها أولًا'); return; }
+  const d=Q[current]; const els=document.querySelectorAll('.opt'); const fb=$('fb'); const g=buzzed;
+  if(k===d.a){
+    els[d.a].classList.add('ok'); soundRight(); confetti();
+    fb.className='fb show good'; fb.innerHTML='✔ أحسنتنّ يا '+groups[g].n+'! +10 نقاط<br>'+d.e;
+    addPoints(g,10); finishQ();
+  } else {
+    els[k].classList.add('no'); soundWrong(); locked.add(g); buzzed=null; renderBoard();
+    if(locked.size>=groups.length){
+      els[d.a].classList.add('ok'); fb.className='fb show bad';
+      fb.innerHTML='✘ لم تُجب أي مجموعة إجابة صحيحة. الإجابة الصحيحة: ('+['أ','ب','ج','د'][d.a]+'). '+d.e; finishQ();
+    } else {
+      fb.className='fb show bad'; fb.innerHTML='✘ إجابة '+groups[g].n+' غير صحيحة… الفرصة الآن لبقية المجموعات!';
+      renderBuzz('⚡ من ترفع يدها أولًا من بقية المجموعات؟');
+    }
+  }
+}
+function confetti(){
+  const c=['#2E6FD8','#159C94','#D9A23A','#C55A11','#D6336C','#548235'];
+  for(let i=0;i<60;i++){const s=document.createElement('i');s.className='confetti';s.style.left=Math.random()*100+'vw';
+    s.style.background=c[i%c.length];s.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),3000);}
+}
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇':'🔊';};
+$('spin').onclick=spin; $('hub').onclick=spin;
+$('reset').onclick=()=>{used.clear();groups.forEach(g=>g.s=0);buzzed=null;$('qbox').style.display='none';$('empty').style.display='block';$('empty').style.padding='';$('empty').innerHTML='🎡<br>أديري العجلة ليظهر السؤال هنا';drawWheel();renderBoard();};
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!(e.target.isContentEditable)){e.preventDefault();spin();}});
+drawWheel(); renderBoard();
+</script>
+</body>
+</html>
