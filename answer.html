@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>تحدي التعادل – صفحة المجموعة</title>
+<style>
+:root{--bg:#F8F5EE;--card:#fff;--line:#E3DCCB;--ink:#1F4E6B;--teal:#159C94;--tealD:#0E7C76;--peach:#F2AE85;--red:#B71C1C;--gold:#D9A23A;--green:#548235;--mint:#E3F4EC;--cream:#FFF8EC}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:"Sakkal Majalla","Traditional Arabic","Segoe UI",Tahoma,"Amiri",sans-serif}
+body{font-size:20px}
+header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;gap:10px}
+.pill{background:var(--peach);color:#fff;border-radius:16px;padding:4px 16px;font-weight:700;font-size:22px;outline:2px dashed #fff;outline-offset:-6px}
+.me{border-radius:14px;padding:4px 12px;color:#fff;font-weight:700;font-size:18px;display:none}
+main{max-width:720px;margin:0 auto;padding:6px 14px 40px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,.05);margin-top:10px}
+h2{color:var(--red);margin:4px 0 10px;font-size:26px}
+.groups{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.groups button,.opt{font:inherit;border:0;border-radius:18px;color:#fff;font-weight:700;cursor:pointer}
+.groups button{font-size:26px;padding:26px 8px}
+.q{font-size:24px;font-weight:700;line-height:1.5;margin:4px 0 10px}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;background:#FBF9F4;color:var(--ink);border:2px solid var(--line);padding:12px;font-size:22px;text-align:right;min-height:64px}
+.opt .l{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:24px}
+.opt:active{transform:scale(.98)}
+.opt.sent{border-color:var(--teal);background:var(--mint)}
+.opt.dim{opacity:.4}
+.ltr{direction:ltr;unicode-bidi:isolate;font-family:"Cambria Math",Cambria,"Times New Roman",serif}
+.big{font-size:60px;text-align:center}
+.center{text-align:center}
+.msg{text-align:center;font-size:24px;font-weight:700;padding:10px}
+.ok{color:var(--green)} .no{color:var(--red)}
+.fig{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:6px;margin-bottom:10px}
+.score{font-family:Calibri,Arial;font-size:44px;font-weight:700}
+.net{position:fixed;bottom:0;left:0;right:0;background:var(--red);color:#fff;text-align:center;padding:6px;font-weight:700;display:none}
+.change{background:none;border:0;color:#8a98a1;font:inherit;font-size:16px;text-decoration:underline;cursor:pointer;margin-top:14px}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<header><div class="pill">⚡ تحدي التعادل</div><div class="me" id="me"></div></header>
+<main id="main"><div class="card center"><div class="big">⏳</div><div class="msg">جارٍ الاتصال…</div></div></main>
+<div class="net" id="net">⚠️ لا يوجد اتصال بالإنترنت</div>
+
+<script>
+/* ================== إعدادات Firebase (نفس الإعدادات في صفحتي المعلمة) ================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBq067CBAa0tLJxNMf60nObygvnRTgYwlI",
+  authDomain: "chem-lab-shaikha.firebaseapp.com",
+  projectId: "chem-lab-shaikha",
+  storageBucket: "chem-lab-shaikha.firebasestorage.app",
+  messagingSenderId: "305599144472",
+  appId: "1:305599144472:web:ae27c01b81b925c238d96d"
+};
+/* ======================================================================================= */
+const COLORS=['#2E6FD8','#159C94','#D9A23A','#C55A11'], L=['أ','ب','ج','د'];
+const $=id=>document.getElementById(id);
+let db, state=null, myG=null, sentFor=null, sentChoice=null;
+try{ myG=localStorage.getItem('nlive_group'); myG=myG===null?null:+myG; }catch(e){}
+function save(g){ try{ localStorage.setItem('nlive_group',g); }catch(e){} }
+function esc(s){ return String(s); }
+
+function render(){
+  const m=$('main');
+  if(!state){ return; }
+  const names=state.groups||['المجموعة 1','المجموعة 2','المجموعة 3','المجموعة 4'];
+  if(myG===null || myG>=names.length){
+    $('me').style.display='none';
+    m.innerHTML=`<div class="card"><h2>اختاري مجموعتك</h2><div class="groups">${names.map((n,k)=>`<button data-k="${k}" style="background:${COLORS[k]}">${n}</button>`).join('')}</div></div>`;
+    m.querySelectorAll('.groups button').forEach(b=>b.onclick=()=>{ myG=+b.dataset.k; save(myG); render(); });
+    return;
+  }
+  $('me').style.display='block'; $('me').style.background=COLORS[myG]; $('me').textContent=names[myG];
+  const sc=(state.scores||[])[myG]||0;
+  const change='<div class="center"><button class="change" id="chg">تغيير المجموعة</button></div>';
+  if(state.phase==='open'){
+    const mine = sentFor===state.round;
+    m.innerHTML=`<div class="card">
+      <div class="q">${state.qText||''}</div>${state.fig?`<div class="fig">${state.fig}</div>`:''}
+      <div class="opts">${(state.opts||[]).map((t,k)=>`<button class="opt ${mine?(k===sentChoice?'sent':'dim'):''}" data-k="${k}"><span class="l" style="background:${COLORS[k]}">${L[k]}</span><span>${t}</span></button>`).join('')}</div>
+      <div class="msg" id="st">${mine?'✅ تم إرسال إجابة مجموعتك… انتظري النتيجة':'⚡ أسرعي! أول إجابة صحيحة تكسب أعلى النقاط'}</div></div>`;
+    if(!mine) m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>send(+b.dataset.k));
+  } else if(state.phase==='closed'){
+    const a=(state.result||{})[myG];
+    let line;
+    if(!a) line='<div class="big">⌛</div><div class="msg">لم تصل إجابة مجموعتك في هذا السؤال</div>';
+    else if(a.ok) line=`<div class="big">🎉</div><div class="msg ok">إجابة صحيحة! ${a.pts?'+'+a.pts+' نقاط':''}</div>`;
+    else line='<div class="big">💡</div><div class="msg no">إجابة غير صحيحة</div>';
+    m.innerHTML=`<div class="card center">${line}
+      <div class="msg">الإجابة الصحيحة: (${L[state.correct]}) ${(state.opts||[])[state.correct]||''}</div>
+      <div>نقاط مجموعتك</div><div class="score" style="color:${COLORS[myG]}">${sc}</div></div>${change}`;
+  } else if(state.phase==='end'){
+    const order=names.map((n,k)=>({n,k,s:(state.scores||[])[k]||0})).sort((a,b)=>b.s-a.s);
+    m.innerHTML=`<div class="card center"><div class="big">🏆</div><h2>${order[0].n} في المركز الأول</h2>
+      ${order.map(o=>`<div class="msg" style="color:${COLORS[o.k]}">${o.n}: ${o.s}</div>`).join('')}</div>`;
+  } else {
+    m.innerHTML=`<div class="card center"><div class="big">👀</div><div class="msg">استعدّي! انظري إلى شاشة العرض… السؤال سيظهر هنا</div>
+      <div>نقاط مجموعتك</div><div class="score" style="color:${COLORS[myG]}">${sc}</div></div>${change}`;
+  }
+  const c=$('chg'); if(c) c.onclick=()=>{ myG=null; save(''); try{localStorage.removeItem('nlive_group');}catch(e){} render(); };
+}
+function send(k){
+  if(!state||state.phase!=='open'||sentFor===state.round) return;
+  const round=state.round, ref=db.collection('nlive_answers').doc(round+'_'+myG);
+  sentFor=round; sentChoice=k; render();
+  db.runTransaction(async tx=>{ const s=await tx.get(ref); if(s.exists) return 'dup';
+    tx.set(ref,{round,g:myG,choice:k,at:firebase.firestore.FieldValue.serverTimestamp()}); return 'ok'; })
+   .then(r=>{ const st=$('st'); if(st&&r==='dup') st.textContent='✅ أرسلت زميلة من مجموعتك الإجابة قبلك'; })
+   .catch(e=>{ sentFor=null; sentChoice=null; render(); const st=$('st'); if(st) st.textContent='⚠️ لم تُرسل الإجابة، حاولي مرة أخرى'; });
+}
+try{
+  firebase.initializeApp(FIREBASE_CONFIG); db=firebase.firestore();
+  db.collection('nlive').doc('state').onSnapshot(s=>{ $('net').style.display='none'; state=s.data()||{phase:'idle'}; if(state.round!==sentFor && state.phase==='open'){ sentChoice=null; } render(); },
+    e=>{ $('net').style.display='block'; $('net').textContent='⚠️ تعذّر الاتصال: '+(e.code||e.message); });
+}catch(e){ $('net').style.display='block'; $('net').textContent='⚠️ إعدادات Firebase غير مكتملة'; }
+window.addEventListener('offline',()=>$('net').style.display='block');
+window.addEventListener('online',()=>$('net').style.display='none');
+</script>
+</body>
+</html>
