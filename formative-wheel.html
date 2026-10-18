@@ -79,7 +79,11 @@ button.alt{background:var(--blue)} button.ghost{background:#fff;color:var(--ink)
 .slot.in{border-style:solid;background:color-mix(in srgb,var(--c) 12%,#fff)}
 .slot.win{background:var(--c);color:#fff}.slot.win b{color:#fff}
 .join{display:flex;gap:16px;align-items:center;justify-content:center;background:#FFF8EC;border:1.5px dashed #D9A23A;border-radius:18px;padding:12px;margin-top:10px}
-.qrbox{background:#fff;padding:8px;border-radius:12px;min-width:186px;min-height:186px;display:grid;place-items:center}
+.qrbox{background:#fff;padding:6px;border-radius:12px;min-width:132px;min-height:132px;display:grid;place-items:center;flex:none}
+.glinks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.gl{border:2px solid var(--c);border-radius:12px;padding:6px 10px;display:flex;flex-direction:column;gap:2px;background:#fff}
+.gl span{color:var(--c);font-weight:700;font-size:20px}
+.gl code{direction:ltr;text-align:left;font-family:Consolas,Calibri,Arial;font-size:19px;font-weight:700;color:#1F4E6B;word-break:break-all}
 .jtxt{color:#1F4E6B;display:flex;flex-direction:column;gap:6px;font-size:22px}
 .jtxt .url{direction:ltr;font-family:Calibri,Arial;font-size:15px;color:#6b7d88;word-break:break-all}
 .opt.locked{cursor:default}
@@ -134,7 +138,7 @@ const FIREBASE_CONFIG = {
   appId: "1:305599144472:web:ae27c01b81b925c238d96d"
 };
 /* رابط صفحة المجموعات بعد رفعها على GitHub Pages */
-const STUDENT_URL = "https://shaikhah-chem.github.io/neutral-live/answer.html";
+const STUDENT_URL = "https://shaikhah-chem.github.io/neutral-live/";
 /* ================================================================================ */
 const LIVE={ok:false,db:null,round:null,unsub:null,ans:{},openedAt:null,onAns:null};
 function liveInit(){
@@ -175,11 +179,13 @@ function arrivalsHTML(revealed,correct,result){
     return `<div class="slot${a?' in':''}${revealed&&r&&r.ok?' win':''}" style="--c:${g.c}"><b>${g.n}</b><span>${st}</span></div>`; }).join('')+'</div>';
 }
 function joinHTML(){
-  return `<div class="join"><div id="qrbox" class="qrbox"></div><div class="jtxt"><b>📲 انضمّي من جهاز مجموعتك</b>
-    <span>امسحي الرمز، ثم اختاري اسم مجموعتك</span><span class="url">${STUDENT_URL}</span></div></div>`;
+  const short=STUDENT_URL.replace('https://','').replace(/\/$/,'');
+  return `<div class="join"><div class="jtxt" style="width:100%"><b>💻 افتحي هذا الرابط في المتصفح، ثم اختاري اسم مجموعتك:</b>
+    <div class="gl" style="--c:#0E7C76;margin:8px 0"><code style="font-size:30px;text-align:center">${short}</code></div>
+    <span style="font-size:17px;color:#6b7d88">أو بالجوال: امسحي الرمز</span></div><div id="qrbox" class="qrbox"></div></div>`;
 }
 function drawQR(){ const el=document.getElementById('qrbox'); if(!el) return; el.innerHTML='';
-  try{ new QRCode(el,{text:STUDENT_URL,width:170,height:170,colorDark:'#1F4E6B',colorLight:'#ffffff'}); }catch(e){ el.textContent='QR'; } }
+  try{ new QRCode(el,{text:STUDENT_URL,width:120,height:120,colorDark:'#1F4E6B',colorLight:'#ffffff'}); }catch(e){ el.textContent='QR'; } }
 
 const Q=[
  {q:'ما المقصود بتفاعل التعادل؟',o:['تفاعل حمض مع قاعدة لينتج ملحًا وماءً','تفكك مركب إلى عناصره الأولية','تفاعل مادة مع الأكسجين لإنتاج طاقة','ذوبان الملح في الماء'],a:0,e:'التعادل: حمض + قاعدة ← ملح + ماء.'},

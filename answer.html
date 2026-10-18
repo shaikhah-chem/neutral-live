@@ -58,6 +58,7 @@ const COLORS=['#2E6FD8','#159C94','#D9A23A','#C55A11'], L=['أ','ب','ج','د'];
 const $=id=>document.getElementById(id);
 let db, state=null, myG=null, sentFor=null, sentChoice=null;
 try{ myG=localStorage.getItem('nlive_group'); myG=myG===null?null:+myG; }catch(e){}
+(function(){ const h=(location.hash||'').replace('#',''); if(/^[1-4]$/.test(h)){ myG=+h-1; try{localStorage.setItem('nlive_group',myG);}catch(e){} } })();
 function save(g){ try{ localStorage.setItem('nlive_group',g); }catch(e){} }
 function esc(s){ return String(s); }
 
